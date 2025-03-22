@@ -1,16 +1,18 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout
-from lib.face_comparison import FaceComparison
+from controllers.face_controller import FaceController
 from ui.right_column import RightColumn
 from ui.left_column import LeftColumn
+from injector import inject
 
 class MainWindow(QMainWindow):
+    @inject
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Face Comparison System")
         self.setMinimumSize(1200, 800)
         
-        # Initialize face comparison system
-        self.face_comparison = FaceComparison()
+        # Store injected controller
+        self.face_controller = FaceController()
         
         # Create main widget and layout
         main_widget = QWidget()

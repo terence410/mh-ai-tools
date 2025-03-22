@@ -52,14 +52,14 @@ class LeftColumn(QWidget):
             self.main_window.log_message(">>> Starting Face Comparison")
             
             try:
-                # Perform face comparison
-                result = self.main_window.face_comparison.compare_images(
+                # Perform face comparison using face_controller
+                result = self.main_window.face_controller.compare_images(
                     self.image1_view.image_area.image_source,
                     self.image2_view.image_area.image_source
                 )
                 
                 # Log the results
-                self.main_window.update_similarity_result(result.similarity_score);
+                self.main_window.update_similarity_result(result.similarity_score)
 
                 # Draw face boxes on both images
                 self.image1_view.image_area.draw_face_box_on_image(result.face1_location)

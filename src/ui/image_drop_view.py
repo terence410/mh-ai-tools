@@ -3,9 +3,10 @@ from PyQt6.QtCore import Qt, QRect, pyqtSignal
 from PyQt6.QtGui import (QDragEnterEvent, QDropEvent, QPixmap, QKeyEvent, 
                         QPainter, QPen)
 
-from lib.common import format_file_size
-from lib.image_color import RGBColorStats
+from controllers.display_controller import DisplayController
+from controllers.image_controller import RGBColorStats
 from .image_area import ImageArea
+from injector import inject
 import os
 
 class ImageDropView(QWidget):
@@ -13,9 +14,11 @@ class ImageDropView(QWidget):
     image_loaded_event = pyqtSignal()  # Signal with image path and title
     copy_color_event = pyqtSignal(str)  # Signal with color string parameter
 
+    @inject
     def __init__(self, title: str):
         super().__init__()
         self.title = title
+        self.display_controller = DisplayController()
         
         # Create main layout
         self.layout = QVBoxLayout(self)
@@ -166,7 +169,7 @@ class ImageDropView(QWidget):
         width = self.image_area.image_pixmap.width()
         height = self.image_area.image_pixmap.height()
         file_size = os.path.getsize(source)
-        size_str = format_file_size(file_size)
+        size_str = self.display_controller.format_file_size(file_size)
         
         # Update image meta with basic info
         self.image_meta.setText(f"{source.split('/')[-1]}, {width}x{height}, {size_str}")

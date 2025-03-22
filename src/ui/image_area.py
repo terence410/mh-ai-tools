@@ -3,10 +3,12 @@ from PyQt6.QtCore import Qt, QRect
 from PyQt6.QtGui import (QDragEnterEvent, QDropEvent, QPixmap, QPainter, QPen)
 import numpy as np
 
-from lib.image_color import RGBColorStats, apply_region_rgb_color_stats, calculate_region_rgb_color_stats
+from controllers.image_controller import ImageController, RGBColorStats
+from injector import inject
 
 class ImageArea(QLabel):
     """Custom QLabel that accepts drag and drop"""
+    @inject
     def __init__(self, parent=None, image_meta=None, logging=None):
         super().__init__(parent)
         self.setAcceptDrops(True)
@@ -23,6 +25,7 @@ class ImageArea(QLabel):
         # Store references to meta and logging labels
         self.image_meta = image_meta
         self.logging = logging
+        self.image_controller = ImageController()
         
         # Add display pixmap for drawing operations
         self.display_pixmap = None
@@ -88,10 +91,10 @@ class ImageArea(QLabel):
         orig_x2 = int((self.selection_box.right() - scaled_rect.left()) * scale_x)
         orig_y2 = int((self.selection_box.bottom() - scaled_rect.top()) * scale_y)
 
-        # Get image data and calculate stats
+        # Get image data and calculate stats using image_controller
         image = self.image_pixmap.toImage()
         region = (orig_x1, orig_y1, orig_x2, orig_y2)
-        stats = calculate_region_rgb_color_stats(image, region)
+        stats = self.image_controller.calculate_region_rgb_color_stats(image, region)
 
         # Store stats and region
         self.region_color_stats = stats
@@ -104,7 +107,6 @@ class ImageArea(QLabel):
                 f"R: {stats.avg_r:.0f} / {stats.r_sd:0.1f}, G: {stats.avg_g:.0f} / {stats.g_sd:0.1f}, B: {stats.avg_b:.0f} / {stats.b_sd:0.1f}\n"
                 f"white: {stats.avg_white:.0f} / {stats.white_sd:0.1f}"
             )
-
 
     """ Begin: Overrriding methods"""
     def dragEnterEvent(self, event: QDragEnterEvent):
@@ -221,7 +223,12 @@ class ImageArea(QLabel):
             return
 
         image = self.image_pixmap.toImage()
-        updated_image = apply_region_rgb_color_stats(image, self.region, self.region_color_stats, color_stats)
+        updated_image = self.image_controller.apply_region_rgb_color_stats(
+            image, 
+            self.region, 
+            self.region_color_stats, 
+            color_stats
+        )
 
         # Update both the original and display pixmaps
         qpixmap = QPixmap.fromImage(updated_image)
