@@ -63,8 +63,8 @@ class LeftColumn(QWidget):
                 self._log_controller.update_similarity_score(result.similarity_score)
 
                 # Draw face boxes on both images
-                self.image1_view.image_area.draw_face_box_on_image(result.face1_location)
-                self.image2_view.image_area.draw_face_box_on_image(result.face2_location)
+                self.image1_view.image_area.update_face_location(result.face1_location)
+                self.image2_view.image_area.update_face_location(result.face2_location)
                 
                 # Log the results
                 self._log_controller.log_message(f"- Similarity Score: {result.similarity_score:.2f}")

@@ -17,6 +17,7 @@ class ImageDropView(QWidget):
     @inject
     def __init__(self, title: str):
         super().__init__()
+        self.setAcceptDrops(True)
         self.title = title
         self.display_controller = DisplayController()
         
@@ -50,7 +51,7 @@ class ImageDropView(QWidget):
         """)
         
         # Create image area using ImageArea
-        self.image_area = ImageArea(self, self.image_meta, self.logging)
+        self.image_area = ImageArea(self._log_message)
         self.image_area.setMinimumSize(300, 500)
         self.image_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_area.setText(f"Drop {title} here")
@@ -158,11 +159,30 @@ class ImageDropView(QWidget):
         """Add a message to the system message area"""
         self.logging.setText(message)
 
+    """ Begin: Overrriding methods"""
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+            
+    def dropEvent(self, event: QDropEvent):
+        if event.mimeData().hasUrls():
+            url = event.mimeData().urls()[0]
+            file_path = url.toLocalFile()
+            self.load_image(file_path)
+        else:
+            event.ignore()
+    """ End: Overrriding methods"""
+
     def load_image(self, source: str):
         """Process and display the image from a file path"""
                 
         # Store the original pixmap
-        self.image_area.update_image(source)
+        self.image_area.load_image(source)
+        if not self.image_area.image_pixmap:
+            return
+        
         self.image_area.clear_region()
         
         # Get file size and dimensions
