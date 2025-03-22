@@ -3,6 +3,7 @@ numpy==1.23.5  # Downgrading numpy for better compatibility
 opencv-python==4.8.1.78
 onnxruntime==1.15.1
 insightface==0.7.3
+injector==0.21.0
 
 # GUI
 PyQt6==6.5.3
