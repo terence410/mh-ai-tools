@@ -12,6 +12,7 @@ class RightColumn(QWidget):
         # Store and register with log controller
         self._log_controller = log_controller
         self._log_controller.add_listener(self.log_message)
+        self._log_controller.add_similarity_listener(self.update_similarity_result)
         
         # Create layout
         right_layout = QVBoxLayout(self)
@@ -33,12 +34,13 @@ class RightColumn(QWidget):
         self.similarity_result.setReadOnly(True)
         self.similarity_result.setText("Similarity results will appear here...")
         self.similarity_result.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.similarity_result.setStyleSheet(self.style_template.replace("COLOR", "#f8f8f8"))
         self.similarity_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         # Calculate single line height using font metrics
         font_metrics = self.similarity_result.fontMetrics()
         line_height = font_metrics.height() + 20 + 2  # Add 2 pixels for padding
         self.similarity_result.setFixedHeight(line_height)
-        self._update_similarity_style("#f8f8f8")  # Set initial background color
         right_layout.addWidget(self.similarity_result)  # No stretch for similarity result
         
         # Add message area (expandable)
@@ -70,12 +72,9 @@ class RightColumn(QWidget):
         """Add a message to the system message area"""
         self.message_area.append(message)
 
-    def _update_similarity_style(self, background_color: str):
-        """Update similarity result style with given background color"""
-        self.similarity_result.setStyleSheet(self.style_template.replace("COLOR", background_color))
-
     def update_similarity_result(self, similarity: float):
+        """Update the similarity result display"""
         [color, message] = self._interpret_similarity(similarity)
-        self._update_similarity_style(color)
-        self.similarity_result.setText(message) 
+        self.similarity_result.setStyleSheet(self.style_template.replace("COLOR", color))
+        self.similarity_result.setText(message)
         self.similarity_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
