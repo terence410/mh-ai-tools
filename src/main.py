@@ -16,6 +16,9 @@ def main():
         'FaceController': 'controllers.face_controller.FaceController',
         'ImageController': 'controllers.image_controller.ImageController',
         'DisplayController': 'controllers.display_controller.DisplayController',
+        'LogController': 'controllers.log_controller.LogController',
+        'LeftColumn': 'ui.left_column.LeftColumn',
+        'RightColumn': 'ui.right_column.RightColumn',
         'MainWindow': 'ui.main_window.MainWindow',
         # Add any other dependencies here
     }

@@ -2,15 +2,16 @@ from PyQt6.QtWidgets import QWidget, QHBoxLayout
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QPainter, QPen
 from ui.image_drop_view import ImageDropView
-from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:
-    from ui.main_window import MainWindow
+from controllers.face_controller import FaceController
+from controllers.log_controller import LogController
+from injector import inject
 
 class LeftColumn(QWidget):
-    def __init__(self, main_window: "MainWindow"):
+    @inject
+    def __init__(self, face_controller: FaceController, log_controller: LogController):
         super().__init__()
-        self.main_window: "MainWindow" = main_window
+        self._face_controller = face_controller
+        self._log_controller = log_controller
         
         # Create layout
         self.layout = QHBoxLayout(self)
@@ -32,7 +33,7 @@ class LeftColumn(QWidget):
 
     def on_copy_color(self, target: str):
         """Copy color from image 1 to image 2"""
-        self.main_window.log_message(f"Copy color to {target}\n")
+        self._log_controller.log_message(f"Copy color to {target}\n")
 
         # check where to copy color
         if target == "Image 2":
@@ -49,23 +50,25 @@ class LeftColumn(QWidget):
         if (self.image1_view.image_area.image_source and 
             self.image2_view.image_area.image_source):
             
-            self.main_window.log_message(">>> Starting Face Comparison")
+            self._log_controller.log_message(">>> Starting Face Comparison")
             
             try:
                 # Perform face comparison using face_controller
-                result = self.main_window.face_controller.compare_images(
+                result = self._face_controller.compare_images(
                     self.image1_view.image_area.image_source,
                     self.image2_view.image_area.image_source
                 )
                 
                 # Log the results
-                self.main_window.update_similarity_result(result.similarity_score)
+                # self.main_window.update_similarity_result(result.similarity_score)
 
                 # Draw face boxes on both images
                 self.image1_view.image_area.draw_face_box_on_image(result.face1_location)
                 self.image2_view.image_area.draw_face_box_on_image(result.face2_location)
+                
+                # Log the results
+                self._log_controller.log_message(f"- Similarity Score: {result.similarity_score:.2f}")
+                self._log_controller.log_message(f"- Processing Time: {result.processing_time:.2f} seconds\n")
                                 
             except Exception as e:
-                self.main_window.log_message(f"Error during face comparison: {str(e)}\n") 
-
-            self.main_window.log_message(f"- Processing Time: {result.processing_time:.2f} seconds\n")
+                self._log_controller.log_message(f"Error during face comparison: {str(e)}\n")

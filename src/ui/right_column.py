@@ -1,10 +1,17 @@
 from typing import Tuple
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTextEdit
 from PyQt6.QtCore import Qt
+from controllers.log_controller import LogController
+from injector import inject
 
 class RightColumn(QWidget):
-    def __init__(self):
+    @inject
+    def __init__(self, log_controller: LogController):
         super().__init__()
+        
+        # Store and register with log controller
+        self._log_controller = log_controller
+        self._log_controller.add_listener(self.log_message)
         
         # Create layout
         right_layout = QVBoxLayout(self)
@@ -61,7 +68,7 @@ class RightColumn(QWidget):
 
     def log_message(self, message: str):
         """Add a message to the system message area"""
-        self.message_area.append(message) 
+        self.message_area.append(message)
 
     def _update_similarity_style(self, background_color: str):
         """Update similarity result style with given background color"""
