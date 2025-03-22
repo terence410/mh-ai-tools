@@ -3,12 +3,12 @@ from controllers.face_controller import FaceController
 from controllers.log_controller import LogController
 from ui.right_column import RightColumn
 from ui.left_column import LeftColumn
-from injector import inject, singleton
+from injector import inject, singleton, Injector
 
 @singleton
 class MainWindow(QMainWindow):
     @inject
-    def __init__(self, face_controller: FaceController, log_controller: LogController, left_column: LeftColumn, right_column: RightColumn):
+    def __init__(self, face_controller: FaceController, log_controller: LogController, injector: Injector):
         super().__init__()
         self.setWindowTitle("Face Comparison System")
         self.setMinimumSize(1200, 800)
@@ -18,9 +18,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(main_widget)
         layout = QHBoxLayout(main_widget)
         
-        # Store columns from injection
-        self.left_column = left_column
-        self.right_column = right_column
+        # Create columns using injector
+        self.left_column = injector.get(LeftColumn)
+        self.right_column = injector.get(RightColumn)
         
         # Add columns to layout
         layout.addWidget(self.left_column)
