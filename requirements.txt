@@ -1,0 +1,30 @@
+# Core dependencies with specific versions
+numpy==1.23.5  # Downgrading numpy for better compatibility
+opencv-python==4.8.1.78
+onnxruntime==1.15.1
+insightface==0.7.3
+
+# GUI
+PyQt6==6.5.3
+PyQt6-Qt6==6.5.3
+PyQt6-sip==13.6.0
+
+# Image processing
+Pillow>=10.0.0
+
+# Required by insightface
+onnx>=1.13.0
+tqdm
+requests
+matplotlib
+Pillow
+scipy
+scikit-learn
+scikit-image
+easydict
+albumentations
+prettytable
+
+# Development tools (optional)
+black==23.12.1
+pytest==7.4.4 
