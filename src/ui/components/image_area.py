@@ -128,10 +128,14 @@ class ImageArea(QLabel):
             return
 
         # Calculate scaling factors
-        scale_x = self.image_pixmap.width() / scaled_rect.width()
-        scale_y = self.image_pixmap.height() / scaled_rect.height()
+        width = self.image_pixmap.width()
+        height = self.image_pixmap.height()
+        scale_x = width / scaled_rect.width()
+        scale_y = height / scaled_rect.height()
 
         # Transform selection box coordinates to original image coordinates
+        selection_width = self.selection_box.width()
+        selection_height = self.selection_box.height()
         orig_x1 = int((self.selection_box.left() - scaled_rect.left()) * scale_x)
         orig_y1 = int((self.selection_box.top() - scaled_rect.top()) * scale_y)
         orig_x2 = int((self.selection_box.right() - scaled_rect.left()) * scale_x)
@@ -148,7 +152,7 @@ class ImageArea(QLabel):
 
         # Update image info with results
         self._log_message(
-            f"Total pixels: {stats.pixel_count}\n"
+            f"Total pixels: {stats.pixel_count}, {selection_width}x{selection_height}\n"
             f"R: {stats.avg_r:.0f} / {stats.r_sd:0.1f}, G: {stats.avg_g:.0f} / {stats.g_sd:0.1f}, B: {stats.avg_b:.0f} / {stats.b_sd:0.1f}\n"
             f"white: {stats.avg_white:.0f} / {stats.white_sd:0.1f}"
         )
@@ -199,10 +203,14 @@ class ImageArea(QLabel):
 
     def load_image(self, source: str):
         try:
-            pixmap = QPixmap(source)
-            if pixmap.isNull():
+            # Load image using QImage first to handle ICC profile
+            image = QImage(source)
+            if image.isNull():
                 self._log_message(f"Error: Could not load image {source.split('/')[-1]}")
                 return
+                
+            # Convert to QPixmap
+            pixmap = QPixmap.fromImage(image)
         except Exception as e:
             self._log_message(f"Error processing image: {str(e)}")
             return
@@ -214,7 +222,7 @@ class ImageArea(QLabel):
 
         return self.image_pixmap
 
-    def apply_color_from_source_image(self, source_region: Tuple[int, int, int, int], source_image: QImage):
+    def copy_color_from_image(self, source_region: Tuple[int, int, int, int], source_image: QImage):
         image = self.image_pixmap.toImage()
         updated_image = self._image_controller.apply_region_lighting_transfer(
             image, 
@@ -232,7 +240,7 @@ class ImageArea(QLabel):
         self._calculate_selection_stats()
 
     
-    def apply_from_color_stats(self, color_stats: RGBColorStats):
+    def shift_to_color_stats(self, color_stats: RGBColorStats):
         if not self.region_color_stats or not self.region:
             return
 

@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt
 from controllers.log_controller import LogController
 from injector import inject
 
-class RightColumn(QWidget):
+class RightView(QWidget):
     @inject
     def __init__(self, log_controller: LogController):
         super().__init__()

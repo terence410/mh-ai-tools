@@ -1,9 +1,10 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout
 from controllers.face_controller import FaceController
 from controllers.log_controller import LogController
-from ui.right_column import RightColumn
-from ui.left_column import LeftColumn
+from ui.views.right_view import RightView
+from ui.views.left_view import LeftView
 from injector import inject, singleton, Injector
+from PyQt6.QtCore import QRect
 
 @singleton
 class MainWindow(QMainWindow):
@@ -11,7 +12,16 @@ class MainWindow(QMainWindow):
     def __init__(self, log_controller: LogController, injector: Injector):
         super().__init__()
         self.setWindowTitle("Face Comparison System")
-        self.setMinimumSize(1200, 800)
+        self.setMinimumSize(1400, 800)
+        
+        # Set window position and size
+        screen = self.screen()
+        screen_geometry = screen.geometry()
+        window_width = 1400
+        window_height = 800
+        x = (screen_geometry.width() - window_width) // 2
+        y = (screen_geometry.height() - window_height) // 2
+        self.setGeometry(QRect(x, y, window_width, window_height))
         
         # Create main widget and layout
         main_widget = QWidget()
@@ -19,15 +29,15 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout(main_widget)
         
         # Create columns using injector
-        left_column = injector.get(LeftColumn)
-        right_column = injector.get(RightColumn)
+        left_view = injector.get(LeftView)
+        right_view = injector.get(RightView)
         
         # Add columns to layout
-        layout.addWidget(left_column)
+        layout.addWidget(left_view)
         
         # Set fixed width for right column
-        right_column.setFixedWidth(400)
-        layout.addWidget(right_column)
+        right_view.setFixedWidth(400)
+        layout.addWidget(right_view)
         
         # Set layout stretch factors (1:0)
         layout.setStretch(0, 1)  # Left column stretches

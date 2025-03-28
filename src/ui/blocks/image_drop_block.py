@@ -5,14 +5,13 @@ from PyQt6.QtGui import (QDragEnterEvent, QDropEvent, QPixmap, QKeyEvent,
 
 from controllers.display_controller import DisplayController
 from controllers.image_controller import RGBColorStats
-from .image_area import ImageArea
+from ..components.image_area import ImageArea
 from injector import inject
 import os
 
-class ImageDropView(QWidget):
-    # Define signal for image loaded
-    image_loaded_event = pyqtSignal()  # Signal with image path and title
-    copy_color_event = pyqtSignal(str)  # Signal with color string parameter
+class ImageDropBlock(QWidget):
+    # Define signal for all events
+    block_event = pyqtSignal(str, str)  # Signal with event type and optional parameter
 
     @inject
     def __init__(self, title: str):
@@ -99,10 +98,11 @@ class ImageDropView(QWidget):
         
         # Define button configurations
         buttons = [
-            ("Paste", self._top_bar_paste_image),
-            ("Transfer ", self._top_bar_copy_color),
-            ("Copy", self._top_bar_copy_image),
-            ("Download", self._top_bar_download_image)
+            ("貼上", self._top_bar_paste_image),
+            ("複製", self._top_bar_copy_image),
+            ("下載", self._top_bar_download_image),
+            ("轉移顏色", self._top_bar_shift_color),
+            ("複製光線", self._top_bar_copy_color),
         ]
         
         # Create a horizontal layout
@@ -139,8 +139,11 @@ class ImageDropView(QWidget):
         else:
             self._log_message("Error: No image in clipboard")
 
+    def _top_bar_shift_color(self):
+        self.block_event.emit("shift_color", self.title)
+
     def _top_bar_copy_color(self):
-        self.copy_color_event.emit(self.title)
+        self.block_event.emit("copy_color", self.title)
 
     def _top_bar_copy_image(self):
         """Copy the current image to clipboard"""
@@ -200,6 +203,6 @@ class ImageDropView(QWidget):
         self.image_meta.setText(f"{source.split('/')[-1]}, {width}x{height}, {size_str}")
         
         # Emit signal that image was loaded
-        self.image_loaded_event.emit()
+        self.block_event.emit("image_loaded", "")
             
     
