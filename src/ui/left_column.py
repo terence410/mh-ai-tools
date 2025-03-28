@@ -36,14 +36,20 @@ class LeftColumn(QWidget):
         self._log_controller.log_message(f"Copy color to {target}\n")
 
         # check where to copy color
-        if target == "Image 2":
-            color_stats = self.image1_view.image_area.region_color_stats;
-            if color_stats and color_stats.pixel_count > 1:
-                self.image2_view.image_area.apply_from_color_stats(color_stats)
-        else:
-            color_stats = self.image2_view.image_area.region_color_stats;
-            if color_stats and color_stats.pixel_count > 1:
-                self.image1_view.image_area.apply_from_color_stats(color_stats)
+        if target == "Image 1":
+            if self.image2_view.image_area.region:
+                self.image1_view.image_area.apply_color_from_source_image(
+                    self.image2_view.image_area.region,
+                    self.image2_view.image_area.image_pixmap.toImage()
+                ) 
+
+            # color_stats = self.image1_view.image_area.region_color_stats;
+            # if color_stats and color_stats.pixel_count > 1:
+                # self.image2_view.image_area.apply_from_color_stats(color_stats)
+        # else:
+            # color_stats = self.image2_view.image_area.region_color_stats;
+            # if color_stats and color_stats.pixel_count > 1:
+                # self.image1_view.image_area.apply_from_color_stats(color_stats)
 
     def on_check_and_compare(self):
         """Check if both images are loaded and perform comparison"""

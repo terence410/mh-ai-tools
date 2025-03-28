@@ -1,4 +1,5 @@
-from typing import Callable
+from typing import Callable, Tuple
+from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QLabel
 from PyQt6.QtCore import Qt, QRect
 from PyQt6.QtGui import (QDragEnterEvent, QDropEvent, QPixmap, QPainter, QPen)
@@ -212,6 +213,24 @@ class ImageArea(QLabel):
         self._fit_image_to_screen()
 
         return self.image_pixmap
+
+    def apply_color_from_source_image(self, source_region: Tuple[int, int, int, int], source_image: QImage):
+        image = self.image_pixmap.toImage()
+        updated_image = self._image_controller.apply_region_lighting_transfer(
+            image, 
+            source_image,
+            source_region, 
+        )
+
+        # Update both the original and display pixmaps
+        qpixmap = QPixmap.fromImage(updated_image)
+        self.image_pixmap = qpixmap
+        self._display_pixmap = QPixmap(qpixmap)
+        self._fit_image_to_screen()
+        
+        # calculate stats again
+        self._calculate_selection_stats()
+
     
     def apply_from_color_stats(self, color_stats: RGBColorStats):
         if not self.region_color_stats or not self.region:

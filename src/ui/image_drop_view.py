@@ -97,32 +97,28 @@ class ImageDropView(QWidget):
             }
         """
         
+        # Define button configurations
+        buttons = [
+            ("Paste", self._top_bar_paste_image),
+            ("Transfer ", self._top_bar_copy_color),
+            ("Copy", self._top_bar_copy_image),
+            ("Download", self._top_bar_download_image)
+        ]
+        
         # Create a horizontal layout
         top_bar_layout = QHBoxLayout()
         top_bar_layout.setContentsMargins(0, 0, 0, 0)
         
-        # Create paste button
-        paste_button = QPushButton("Paste")
-        paste_button.setFixedSize(80, 28)
-        paste_button.clicked.connect(self._top_bar_paste_image)
-        paste_button.setStyleSheet(button_style)
+        # Create and add buttons
+        for text, callback in buttons:
+            button = QPushButton(text)
+            button.setFixedSize(80, 28)
+            button.clicked.connect(callback)
+            button.setStyleSheet(button_style)
+            top_bar_layout.addWidget(button)
         
-        # Create copy color button
-        copy_color_button = QPushButton("Copy Color")
-        copy_color_button.setFixedSize(80, 28)
-        copy_color_button.clicked.connect(self._top_bar_copy_color)
-        copy_color_button.setStyleSheet(button_style)
-
-        download_button = QPushButton("Download")
-        download_button.setFixedSize(80, 28)
-        download_button.clicked.connect(self._top_bar_download_image)
-        download_button.setStyleSheet(button_style)
-        
-        # Add buttons to layout
-        top_bar_layout.addWidget(paste_button)
-        top_bar_layout.addWidget(copy_color_button)
-        top_bar_layout.addWidget(download_button)
-        top_bar_layout.addStretch()  # Add stretch to push buttons to the left
+        # Add stretch to push buttons to the left
+        top_bar_layout.addStretch()
         
         # Add the layout directly to the main layout
         self.layout.addLayout(top_bar_layout)
@@ -145,6 +141,15 @@ class ImageDropView(QWidget):
 
     def _top_bar_copy_color(self):
         self.copy_color_event.emit(self.title)
+
+    def _top_bar_copy_image(self):
+        """Copy the current image to clipboard"""
+        if self.image_area.image_pixmap:
+            clipboard = QApplication.clipboard()
+            clipboard.setPixmap(self.image_area.image_pixmap)
+            self._log_message("Image copied to clipboard")
+        else:
+            self._log_message("Error: No image to copy")
 
     def _top_bar_download_image(self):
         """Prompt to save the image if it exists"""
