@@ -222,7 +222,7 @@ class ImageArea(QLabel):
         self._fit_image_to_screen()
 
         # check image size
-        if self.image_pixmap.width() < 512 and self.image_pixmap.height() < 512:
+        if self.image_pixmap.width() < 384 and self.image_pixmap.height() < 384:
             self._log_message(f"Image size is too small")
 
         return self.image_pixmap
