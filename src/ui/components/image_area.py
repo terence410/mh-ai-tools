@@ -114,7 +114,7 @@ class ImageArea(QLabel):
 
     def _update_selection_box(self, box: QRect):
         self.selection_box = box
-        self._calculate_selection_stats()
+        # self._calculate_selection_stats()
 
     def _calculate_selection_stats(self):
         """Calculate and log statistics for the selected area"""
@@ -215,10 +215,15 @@ class ImageArea(QLabel):
             self._log_message(f"Error processing image: {str(e)}")
             return
 
+
         self.image_pixmap = pixmap
         self._display_pixmap = QPixmap(pixmap)  # Create a copy for display
         self.image_source = source
         self._fit_image_to_screen()
+
+        # check image size
+        if self.image_pixmap.width() < 512 and self.image_pixmap.height() < 512:
+            self._log_message(f"Image size is too small")
 
         return self.image_pixmap
 

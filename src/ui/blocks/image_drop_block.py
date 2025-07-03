@@ -101,8 +101,8 @@ class ImageDropBlock(QWidget):
             ("貼上", self._top_bar_paste_image),
             ("複製", self._top_bar_copy_image),
             ("下載", self._top_bar_download_image),
-            ("轉移顏色", self._top_bar_shift_color),
-            ("複製光線", self._top_bar_copy_color),
+            # ("轉移顏色", self._top_bar_shift_color),
+            # ("複製光線", self._top_bar_copy_color),
         ]
         
         # Create a horizontal layout
