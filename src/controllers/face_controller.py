@@ -39,7 +39,9 @@ class FaceController:
     def _process_image(self, image_path: str) -> Tuple[Optional[np.ndarray], Optional[List]]:
         """Process an image and detect faces"""
         try:
-            img = cv2.imread(image_path)
+            # Use cv2.imdecode with np.fromfile to handle Unicode paths
+            img_array = np.fromfile(image_path, dtype=np.uint8)
+            img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
             if img is None:
                 raise ValueError(f"Could not load image: {image_path}")
             
